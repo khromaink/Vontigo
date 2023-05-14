@@ -14,6 +14,16 @@ export const knexInstance: Knex = await knex({
 	},
 	useNullAsDefault: true
 });
+export const knexInstanceProd: Knex = await knex({
+	client: 'mysql',
+	connection: {
+		host: '179.61.199.11',
+		user: 'vontigo',
+		password: 'VontigoP@ssw0rd',
+		database: 'vontigo',
+		charset: 'utf8'
+	}
+});
 
 // let knex_conn: Knex;
 // export async function connect(connection: Record<string, string>) {
