@@ -27,6 +27,7 @@ We warmly invite you to discover the exciting world of Vontigo with us and kindl
 <a href="https://www.producthunt.com/posts/vontigo?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-vontigo" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=394092&theme=light" alt="Vontigo - 🤖&#0032;The&#0032;AI&#0045;Powered&#0044;&#0032;Full&#0045;Stack&#0032;CMS&#0032;Built&#0032;with&#0032;SvelteKit | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 ## Tech stacks & Services
+
 <picture>
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Svelte_Logo.svg/640px-Svelte_Logo.svg.png" alt="sveltekit" height="50px"/></picture>
 <picture>
@@ -51,7 +52,6 @@ We warmly invite you to discover the exciting world of Vontigo with us and kindl
 <picture>
   <img alt="BrainiacMinds.com" src="https://play-lh.googleusercontent.com/2hKdiuS26NkQCdwz6QX46EyLKEfw65PTuDt_yGMaOsDpEImZFH2-JoQLqT89KBorfEs=w480-h960-rw" height="50px">
 </picture>
-
 
 ## Quickstart install
 
@@ -102,7 +102,7 @@ pnpm dev
 ```bash
 cd .\apps\web\
 pnpm i
-pnpm run dev -- --open
+pnpm run dev --open
 ```
 
 > ⚠️ Incase you are not able to see the `Setup` screen. Make sure you have deleted the `./apps/web/database/vontigo.db` file.

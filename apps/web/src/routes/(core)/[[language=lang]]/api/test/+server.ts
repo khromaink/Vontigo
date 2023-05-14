@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { knexInstance, knexInstanceProd } from '$lib/core/core/server/data/db/connection';
 import sqlite3 from 'sqlite3';
 import knex, { Knex } from 'knex';
-import { sqlDdlToJsonSchema } from 'sql-ddl-to-json-schema';
 
 // Configuration object for Knex
 const config = {
@@ -67,7 +66,7 @@ export async function GET({ url }) {
 
 								// Handle boolean data types in the schema
 								schema = handleBooleanTypes(schema);
-								schema = handlePrimaryKeys(schema);
+								// schema = handlePrimaryKeys(schema);
 								console.log(schema);
 
 								// Create the MySQL table based on the schema information
