@@ -4,6 +4,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { knexInstance, knexInstanceProd } from '$lib/core/core/server/data/db/connection';
 import sqlite3 from 'sqlite3';
 import knex, { Knex } from 'knex';
+import { Pool } from 'pg';
+// import { createKysely } from '@vercel/postgres-kysely';
+import {
+	Kysely,
+	PostgresDialect,
+	Generated,
+	ColumnType,
+	Selectable,
+	Insertable,
+	Updateable
+} from 'kysely';
 
 // Configuration object for Knex
 const config = {
@@ -43,46 +54,82 @@ function handlePrimaryKeys(schema: string): string {
 	return schema.replace(/(\s)`id` varchar(24)(\s)/gi, '$1`id` varchar(24) PRIMARY KEY$2');
 }
 
+interface SettingsTable {
+	id: string;
+	group: string;
+	key: string;
+	value: string | null;
+	type: string;
+	flags: string | null;
+	created_at: string;
+	created_by: string;
+	updated_at: string | null;
+	updated_by: string | null;
+}
+
+interface Database {
+	settings: SettingsTable;
+}
+
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {
-	await knexInstance
-		.raw(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`)
-		.then(function (tables) {
-			tables.forEach(async function (table) {
-				console.log(table);
-				const tableName = table.name;
+	const db = new Kysely<Database>({
+		// Use MysqlDialect for MySQL and SqliteDialect for SQLite.
+		dialect: new PostgresDialect({
+			pool: new Pool({
+				host: 'ep-old-mouse-313669-pooler.us-east-1.postgres.vercel-storage.com',
+				database: 'verceldb',
+				user: 'default',
+				//host: 'your_host',
+				//database: 'your_database',
+				password: 'NlVQ3m6qtLoz',
+				port: 5432,
+				ssl: true,
+				sslmode: 'require'
+			})
+		})
+	});
 
-				await knexInstance
-					.raw(`SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}'`)
-					.then(function (rows) {
-						console.log(rows);
-						rows.forEach(async function (row) {
-							if (row) {
-								let schema = row.sql
-									//.replace(/^CREATE TABLE\s+[^\s]+\s+\(/i, '(')
-									.replace(/\n/g, '')
-									.replace(/\s+/g, ' ')
-									.replace(/\"/g, '`');
+	const settings = await db.selectFrom('settings').select(['id', 'key', 'value']).execute();
 
-								// Handle boolean data types in the schema
-								schema = handleBooleanTypes(schema);
-								// schema = handlePrimaryKeys(schema);
-								console.log(schema);
+	// await knexInstance
+	// 	.raw(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`)
+	// 	.then(function (tables) {
+	// 		tables.forEach(async function (table) {
+	// 			console.log(table);
+	// 			const tableName = table.name;
 
-								// Create the MySQL table based on the schema information
-								await knexInstanceProd.schema
-									.raw(schema)
-									.then(function () {
-										console.log(`Table '${tableName}' created`);
-									})
-									.catch(function (err) {
-										console.error(`Error creating table '${tableName}':`, err);
-									});
-							}
-						});
-					});
-			});
-		});
+	// 			await knexInstance
+	// 				.raw(`SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}'`)
+	// 				.then(function (rows) {
+	// 					console.log(rows);
+	// 					rows.forEach(async function (row) {
+	// 						if (row) {
+	// 							let schema = row.sql
+	// 								//.replace(/^CREATE TABLE\s+[^\s]+\s+\(/i, '(')
+	// 								.replace(/\n/g, '')
+	// 								.replace(/\s+/g, ' ')
+	// 								.replace(/\"/g, '`');
+
+	// 							// Handle boolean data types in the schema
+	// 							schema = handleBooleanTypes(schema);
+	// 							// schema = handlePrimaryKeys(schema);
+	// 							console.log(schema);
+
+	// 							// Create the MySQL table based on the schema information
+	// 							await knexInstanceProd.schema
+	// 								.raw(schema)
+	// 								.then(function () {
+	// 									console.log(`Table '${tableName}' created`);
+	// 								})
+	// 								.catch(function (err) {
+	// 									console.error(`Error creating table '${tableName}':`, err);
+	// 								});
+	// 						}
+	// 					});
+	// 				});
+	// 		});
+	// 	});
 
 	// // Get the Knex configuration for the current environment
 	// const knexConfigDev = config.development;
@@ -156,7 +203,7 @@ export async function GET({ url }) {
 	// db.close();
 	// _knexDev.destroy();
 
-	return new Response(JSON.stringify({ message: uuidv4() }), { status: 200 });
+	return new Response(JSON.stringify({ settings }), { status: 200 });
 }
 
 function generatePostId(title: string): string {
